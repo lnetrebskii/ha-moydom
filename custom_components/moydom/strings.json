@@ -1,0 +1,52 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Мой Дом",
+        "description": "Enter the phone number registered in the Мой Дом app. An SMS with a code will be sent to it.",
+        "data": {
+          "phone": "Phone number"
+        }
+      },
+      "account": {
+        "title": "Choose contract",
+        "description": "Several contracts are bound to this number. Pick one.",
+        "data": {
+          "account": "Contract"
+        }
+      },
+      "code": {
+        "title": "SMS code",
+        "description": "Enter the code sent to {phone}.",
+        "data": {
+          "code": "Code"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Sign in again",
+        "description": "The session expired. A new code will be sent to {phone}."
+      }
+    },
+    "error": {
+      "invalid_phone": "Enter the number as 79XXXXXXXXX",
+      "cannot_connect": "Cannot reach the server",
+      "invalid_code": "Wrong code"
+    },
+    "abort": {
+      "already_configured": "This contract is already added",
+      "cannot_connect": "Cannot reach the server",
+      "reauth_successful": "Signed in again",
+      "unique_id_mismatch": "Signed in with a different contract"
+    }
+  },
+  "entity": {
+    "button": {
+      "open_door": {
+        "name": "Open door"
+      },
+      "open_entrance": {
+        "name": "Open entrance {entrance}"
+      }
+    }
+  }
+}

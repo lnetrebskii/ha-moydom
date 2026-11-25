@@ -1,0 +1,18 @@
+{
+  "domain": "moydom",
+  "name": "Мой Дом (Электронный город)",
+  "codeowners": [
+    "@lnetrebskii"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/lnetrebskii/ha-moydom",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/lnetrebskii/ha-moydom/issues",
+  "loggers": [
+    "custom_components.moydom"
+  ],
+  "requirements": [],
+  "version": "0.1.0"
+}

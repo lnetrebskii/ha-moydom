@@ -1,0 +1,52 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Мой Дом",
+        "description": "Введите номер телефона, на который зарегистрировано приложение «Мой Дом». На него придёт SMS с кодом.",
+        "data": {
+          "phone": "Номер телефона"
+        }
+      },
+      "account": {
+        "title": "Выбор договора",
+        "description": "К номеру привязано несколько договоров. Выберите нужный.",
+        "data": {
+          "account": "Договор"
+        }
+      },
+      "code": {
+        "title": "Код из SMS",
+        "description": "Введите код, отправленный на {phone}.",
+        "data": {
+          "code": "Код"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Нужен повторный вход",
+        "description": "Сессия истекла. Мы отправим новый код на {phone}."
+      }
+    },
+    "error": {
+      "invalid_phone": "Введите номер в формате 79XXXXXXXXX",
+      "cannot_connect": "Не удалось связаться с сервером",
+      "invalid_code": "Неверный код"
+    },
+    "abort": {
+      "already_configured": "Этот договор уже добавлен",
+      "cannot_connect": "Не удалось связаться с сервером",
+      "reauth_successful": "Вход выполнен заново",
+      "unique_id_mismatch": "Вошли под другим договором"
+    }
+  },
+  "entity": {
+    "button": {
+      "open_door": {
+        "name": "Открыть дверь"
+      },
+      "open_entrance": {
+        "name": "Открыть подъезд {entrance}"
+      }
+    }
+  }
+}

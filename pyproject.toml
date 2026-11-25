@@ -1,0 +1,36 @@
+[project]
+name = "ha-moydom"
+version = "0.1.0"
+description = "Home Assistant custom integration: intercom video and door opener for the Мой Дом (Электронный город / Дом.ру) app"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "aiohttp",
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["A", "ASYNC", "B", "BLE", "C4", "E", "F", "FLY", "G", "I", "LOG", "PERF", "PIE", "PL", "PT", "RET", "RSE", "RUF", "S", "SIM", "T20", "TRY", "UP", "W"]
+ignore = ["PLR0913", "PLR2004", "TRY003", "TRY300", "RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "SLF001", "S105", "S106"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+known-first-party = ["homeassistant"]
+combine-as-imports = true
