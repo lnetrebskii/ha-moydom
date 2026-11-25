@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from homeassistant.const import Platform
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import MoydomApi
@@ -15,17 +16,30 @@ from .const import (
     CONF_OPERATOR_ID,
     CONF_PLACE_ID,
     CONF_REFRESH_TOKEN,
+    DOMAIN,
+    STREAM_KEY_DATA,
 )
 from .coordinator import MoydomCoordinator
 from .models import Tokens
+from .stream_proxy import MoydomStreamView, new_stream_key
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.typing import ConfigType
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 PLATFORMS = [Platform.BUTTON, Platform.CAMERA]
 
 type MoydomConfigEntry = ConfigEntry[MoydomCoordinator]
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Register the video relay used by the cameras."""
+    hass.data[DOMAIN] = {STREAM_KEY_DATA: new_stream_key()}
+    hass.http.register_view(MoydomStreamView(hass))
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: MoydomConfigEntry) -> bool:
