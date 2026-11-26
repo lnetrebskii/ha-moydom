@@ -161,6 +161,14 @@ async def test_video_url_refreshes_the_session_first() -> None:
     assert session.calls[1].headers["User-Agent"].startswith("Google Pixel 7")
 
 
+async def test_light_video_url_asks_for_the_light_stream() -> None:
+    session = FakeSession()
+    session.push(200, {"data": {"status": True}})
+    session.push(200, {"data": {"URL": "https://cctv.example:18080/rtsp/a/b/d=2", "Error": None}})
+    await make_api(session).async_video_url(8880001, light=True)
+    assert session.calls[1].params == {"LightStream": 1, "Format": "H264"}
+
+
 async def test_video_url_missing_raises() -> None:
     session = FakeSession()
     session.push(200, {"data": {}})

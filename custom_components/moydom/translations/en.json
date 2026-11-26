@@ -48,5 +48,22 @@
         "name": "Open entrance {entrance}"
       }
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Indoor monitors",
+        "data": {
+          "onvif": "Show the intercoms to indoor monitors as ONVIF cameras",
+          "go2rtc_url": "go2rtc address",
+          "rtsp_port": "go2rtc RTSP port"
+        },
+        "data_description": {
+          "onvif": "A monitor that searches the network for IP cameras finds the intercom and shows its light (960x528) video. Needs the go2rtc add-on.",
+          "go2rtc_url": "Address of the go2rtc API, as seen from Home Assistant.",
+          "rtsp_port": "Port of the go2rtc RTSP server, as seen from the monitor."
+        }
+      }
+    }
   }
 }

@@ -242,14 +242,19 @@ class MoydomApi:
             raise ApiError(msg)
         return body
 
-    async def async_video_url(self, camera_id: int) -> str:
-        """Return a fresh live stream URL (H.264 over HTTPS)."""
+    async def async_video_url(self, camera_id: int, *, light: bool = False) -> str:
+        """Return a fresh live stream URL (H.264 over HTTPS).
+
+        The light stream is 960x528 instead of 1920x1080: indoor monitors decode it.
+        """
         session_path = "api/mh-camera-personal/mobile/v1/video/refresh-user-session"
         status, _ = await self._request("PUT", session_path, params={"externalCameraId": camera_id})
         if status != 200:
             _LOGGER.debug("Video session refresh returned HTTP %s", status)
         path = f"rest/v1/forpost/cameras/{camera_id}/video"
-        status, body = await self._request("GET", path, params={"LightStream": 0, "Format": "H264"})
+        status, body = await self._request(
+            "GET", path, params={"LightStream": int(light), "Format": "H264"}
+        )
         data = self._parse(status, body, path)["data"]
         if not data.get("URL"):
             msg = f"{path}: {data.get('Error') or 'no stream URL'}"

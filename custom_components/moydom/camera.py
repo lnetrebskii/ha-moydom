@@ -8,8 +8,9 @@ from homeassistant.components.camera import Camera, CameraEntityFeature
 from homeassistant.exceptions import HomeAssistantError
 
 from .api import MoydomError
-from .const import DOMAIN, SNAPSHOT_HEIGHT, SNAPSHOT_WIDTH, STREAM_KEY_DATA, STREAM_PATH
+from .const import DOMAIN, SNAPSHOT_HEIGHT, SNAPSHOT_WIDTH, STREAM_KEY_DATA
 from .entity import MoydomEntity
+from .stream_proxy import relay_url
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -50,7 +51,7 @@ class MoydomCamera(MoydomEntity, Camera):
         api = self.hass.config.api
         port = api.port if api is not None and api.port else 8123
         key = self.hass.data[DOMAIN][STREAM_KEY_DATA]
-        return f"http://127.0.0.1:{port}{STREAM_PATH}/{self.control.control_id}?key={key}"
+        return relay_url(port, self.control.control_id, key)
 
     async def async_camera_image(
         self, width: int | None = None, height: int | None = None

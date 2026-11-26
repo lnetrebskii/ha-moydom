@@ -39,6 +39,12 @@ def new_stream_key() -> str:
     return secrets.token_urlsafe(32)
 
 
+def relay_url(port: int, control_id: int, key: str, *, light: bool = False) -> str:
+    """Return the local address of the relay for an intercom."""
+    url = f"http://127.0.0.1:{port}{STREAM_PATH}/{control_id}?key={key}"
+    return f"{url}&light=1" if light else url
+
+
 class MoydomStreamView(HomeAssistantView):
     """Relay ``/api/moydom/stream/{control_id}`` to a fresh cloud stream."""
 
@@ -68,7 +74,9 @@ class MoydomStreamView(HomeAssistantView):
             raise web.HTTPNotFound
         coordinator, camera_id = found
         try:
-            source = await coordinator.api.async_video_url(camera_id)
+            source = await coordinator.api.async_video_url(
+                camera_id, light=request.query.get("light") == "1"
+            )
         except MoydomError as err:
             _LOGGER.warning("Cannot get the stream URL: %s", err)
             raise web.HTTPBadGateway from err

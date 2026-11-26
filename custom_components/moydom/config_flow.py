@@ -9,18 +9,26 @@ import uuid
 
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
+from homeassistant.core import callback
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import ApiError, InvalidCodeError, MoydomApi
 from .const import (
     CONF_ACCESS_TOKEN,
     CONF_ACCOUNT_ID,
+    CONF_GO2RTC_URL,
     CONF_INSTALLATION_ID,
+    CONF_ONVIF,
     CONF_OPERATOR_ID,
     CONF_PHONE,
     CONF_PLACE_ID,
     CONF_REFRESH_TOKEN,
+    CONF_RTSP_PORT,
+    DEFAULT_GO2RTC_URL,
+    DEFAULT_ONVIF,
+    DEFAULT_RTSP_PORT,
     DOMAIN,
 )
 from .models import Account
@@ -33,6 +41,12 @@ class MoydomConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle the SMS login."""
 
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> MoydomOptionsFlow:
+        """Return the options flow."""
+        return MoydomOptionsFlow()
 
     def __init__(self) -> None:
         """Initialise the flow state."""
@@ -167,3 +181,25 @@ class MoydomConfigFlow(ConfigFlow, domain=DOMAIN):
         except ApiError:
             return self.async_abort(reason="cannot_connect")
         return await self._after_accounts()
+
+
+class MoydomOptionsFlow(OptionsFlow):
+    """Options of the indoor monitor (ONVIF camera) support."""
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Edit whether intercoms are shown to monitors and where go2rtc is."""
+        if user_input is not None:
+            return self.async_create_entry(data=user_input)
+        options = self.config_entry.options
+        schema = vol.Schema(
+            {
+                vol.Required(CONF_ONVIF, default=options.get(CONF_ONVIF, DEFAULT_ONVIF)): bool,
+                vol.Required(
+                    CONF_GO2RTC_URL, default=options.get(CONF_GO2RTC_URL, DEFAULT_GO2RTC_URL)
+                ): cv.url,
+                vol.Required(
+                    CONF_RTSP_PORT, default=options.get(CONF_RTSP_PORT, DEFAULT_RTSP_PORT)
+                ): vol.All(vol.Coerce(int), vol.Range(min=1, max=65535)),
+            }
+        )
+        return self.async_show_form(step_id="init", data_schema=schema)

@@ -28,3 +28,11 @@ SNAPSHOT_HEIGHT = 720
 OPEN_ACTION_NAME = "accessControlOpen"
 STREAM_PATH = "/api/moydom/stream"
 STREAM_KEY_DATA = "stream_key"
+
+CONF_ONVIF = "onvif"
+CONF_GO2RTC_URL = "go2rtc_url"
+CONF_RTSP_PORT = "rtsp_port"
+DEFAULT_ONVIF = True
+DEFAULT_GO2RTC_URL = "http://127.0.0.1:1984"
+DEFAULT_RTSP_PORT = 8554
+BRIDGE_DATA = "bridge"

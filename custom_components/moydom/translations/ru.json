@@ -48,5 +48,22 @@
         "name": "Открыть подъезд {entrance}"
       }
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Мониторы в квартире",
+        "data": {
+          "onvif": "Показывать домофоны мониторам как ONVIF-камеры",
+          "go2rtc_url": "Адрес go2rtc",
+          "rtsp_port": "RTSP-порт go2rtc"
+        },
+        "data_description": {
+          "onvif": "Монитор, который ищет в сети IP-камеры, найдёт домофон и покажет его облегчённое видео (960x528). Нужен add-on go2rtc.",
+          "go2rtc_url": "Адрес API go2rtc с точки зрения Home Assistant.",
+          "rtsp_port": "Порт RTSP-сервера go2rtc с точки зрения монитора."
+        }
+      }
+    }
   }
 }
