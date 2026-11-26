@@ -28,7 +28,7 @@ select = ["A", "ASYNC", "B", "BLE", "C4", "E", "F", "FLY", "G", "I", "LOG", "PER
 ignore = ["PLR0913", "PLR2004", "TRY003", "TRY300", "RUF001", "RUF002", "RUF003"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["E501", "S101", "S314", "SLF001", "S105", "S106"]
+"tests/*" = ["E501", "S101", "S314", "SLF001", "S105", "S106", "S324"]
 
 [tool.ruff.lint.isort]
 force-sort-within-sections = true

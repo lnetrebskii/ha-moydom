@@ -21,6 +21,7 @@ from .const import (
     STREAM_KEY_DATA,
 )
 from .coordinator import MoydomCoordinator
+from .doorbell import CallListener
 from .models import Tokens
 from .monitor import MonitorBridge
 from .onvif_view import MoydomOnvifView
@@ -33,7 +34,7 @@ if TYPE_CHECKING:
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
-PLATFORMS = [Platform.BUTTON, Platform.CAMERA]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.BUTTON, Platform.CAMERA, Platform.EVENT]
 
 type MoydomConfigEntry = ConfigEntry[MoydomCoordinator]
 
@@ -87,6 +88,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: MoydomConfigEntry) -> bo
         )
     )
     entry.async_create_background_task(hass, bridge.async_sync(entry), f"{DOMAIN}_monitor_setup")
+
+    calls = CallListener(hass, coordinator)
+    entry.async_on_unload(calls.close)
+    entry.async_on_unload(
+        coordinator.async_add_listener(
+            lambda: entry.async_create_background_task(hass, calls.async_sync(), f"{DOMAIN}_calls")
+        )
+    )
+    entry.async_create_background_task(hass, calls.async_sync(), f"{DOMAIN}_calls_setup")
     return True
 
 

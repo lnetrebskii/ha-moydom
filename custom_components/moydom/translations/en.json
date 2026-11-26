@@ -47,6 +47,23 @@
       "open_entrance": {
         "name": "Open entrance {entrance}"
       }
+    },
+    "binary_sensor": {
+      "call": {
+        "name": "Call"
+      }
+    },
+    "event": {
+      "doorbell": {
+        "name": "Doorbell",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "ring": "Ring"
+            }
+          }
+        }
+      }
     }
   },
   "options": {

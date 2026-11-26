@@ -21,6 +21,7 @@ from .const import (
     REQUEST_TIMEOUT_SECONDS,
 )
 from .models import AccessControl, Account, Place, Tokens
+from .sip import SipAccount
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -260,6 +261,19 @@ class MoydomApi:
             msg = f"{path}: {data.get('Error') or 'no stream URL'}"
             raise ApiError(msg)
         return str(data["URL"])
+
+    async def async_sip_account(self, control: AccessControl) -> SipAccount:
+        """Return the SIP credentials of this installation for an intercom."""
+        path = f"rest/v1/places/{control.place_id}/accesscontrols/{control.control_id}/sipdevices"
+        status, body = await self._request(
+            "POST", path, json_body={"installationId": self._installation_id}
+        )
+        data = self._parse(status, body, path)["data"]
+        try:
+            return SipAccount(str(data["login"]), str(data["password"]), str(data["realm"]))
+        except KeyError as err:
+            msg = f"{path}: no SIP account in the answer"
+            raise ApiError(msg) from err
 
     async def async_open_door(self, control: AccessControl, entrance_id: int | None = None) -> None:
         """Open the door of the intercom."""

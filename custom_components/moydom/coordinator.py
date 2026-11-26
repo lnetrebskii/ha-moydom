@@ -11,6 +11,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .api import ApiError, AuthError, MoydomApi
 from .const import DOMAIN, UPDATE_INTERVAL_MINUTES
+from .doorbell import Doorbell
 from .models import AccessControl
 
 if TYPE_CHECKING:
@@ -33,6 +34,11 @@ class MoydomCoordinator(DataUpdateCoordinator[dict[int, AccessControl]]):
             update_interval=timedelta(minutes=UPDATE_INTERVAL_MINUTES),
         )
         self.api = api
+        self._doorbells: dict[int, Doorbell] = {}
+
+    def doorbell(self, control_id: int) -> Doorbell:
+        """Return the doorbell state of an intercom."""
+        return self._doorbells.setdefault(control_id, Doorbell())
 
     async def _async_update_data(self) -> dict[int, AccessControl]:
         """Fetch all intercoms keyed by their id."""

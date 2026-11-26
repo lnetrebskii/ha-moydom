@@ -47,6 +47,23 @@
       "open_entrance": {
         "name": "Открыть подъезд {entrance}"
       }
+    },
+    "binary_sensor": {
+      "call": {
+        "name": "Звонок"
+      }
+    },
+    "event": {
+      "doorbell": {
+        "name": "Звонок в дверь",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "ring": "Звонок"
+            }
+          }
+        }
+      }
     }
   },
   "options": {
