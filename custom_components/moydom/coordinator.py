@@ -44,9 +44,16 @@ class MoydomCoordinator(DataUpdateCoordinator[dict[int, AccessControl]]):
         """Fetch all intercoms keyed by their id."""
         try:
             controls: dict[int, AccessControl] = {}
-            for place in await self.api.async_get_places():
-                for control in await self.api.async_get_access_controls(place.place_id):
+            places = await self.api.async_get_places()
+            for place in places:
+                found = await self.api.async_get_access_controls(place.place_id)
+                _LOGGER.debug("Place %s has %d intercoms", place.place_id, len(found))
+                for control in found:
                     controls[control.control_id] = control
+            if not controls:
+                _LOGGER.warning(
+                    "No intercoms found: %d addresses %s", len(places), [p.place_id for p in places]
+                )
         except AuthError as err:
             raise ConfigEntryAuthFailed(str(err)) from err
         except ApiError as err:
