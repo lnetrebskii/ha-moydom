@@ -27,6 +27,7 @@ REGISTER_EXPIRES = 60
 MAX_DATAGRAM_BYTES = 8192
 _PARAMS = re.compile(r'(\w+)=(?:"([^"]*)"|([^,\s]+))')
 _PEER_METHODS = frozenset({"OPTIONS", "BYE", "NOTIFY", "INFO", "MESSAGE", "UPDATE"})
+_CALL_METHODS = frozenset({"INVITE", "CANCEL", "BYE"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -143,6 +144,8 @@ class SipUser:
 
     def register(self, authorization: str | None = None) -> bytes:
         """Build a REGISTER request."""
+        if authorization is None:
+            self._challenged = False
         self._cseq += 1
         account = self._account
         lines = [
@@ -168,6 +171,14 @@ class SipUser:
         reaction = Reaction()
         if message is None:
             return reaction
+        if message.method in _CALL_METHODS:
+            _LOGGER.debug(
+                "SIP %s call %s from %s, reason: %s",
+                message.method,
+                message.call_id,
+                caller_name(message.header("from")),
+                message.header("reason") or "-",
+            )
         if message.status:
             self._on_response(message, reaction)
         elif message.method == "INVITE":
@@ -262,6 +273,7 @@ class SipClient(asyncio.DatagramProtocol):
         self._user: SipUser | None = None
         self._transport: asyncio.DatagramTransport | None = None
         self._task: asyncio.Task[None] | None = None
+        self._registered: bool | None = None
 
     async def async_start(self, port: int = SIP_PORT) -> None:
         """Open the socket and start registering."""
@@ -290,8 +302,10 @@ class SipClient(asyncio.DatagramProtocol):
         reaction = self._user.receive(data)
         for datagram in reaction.send:
             self._send(datagram)
-        if reaction.registered is not None and self._on_registered is not None:
-            self._on_registered(reaction.registered, reaction.error)
+        if reaction.registered is not None and reaction.registered != self._registered:
+            self._registered = reaction.registered
+            if self._on_registered is not None:
+                self._on_registered(reaction.registered, reaction.error)
         for event in reaction.events:
             self._on_event(event)
 

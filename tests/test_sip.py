@@ -6,6 +6,8 @@ import asyncio
 import hashlib
 import importlib
 
+import pytest
+
 sip = importlib.import_module("moydom_core.sip")
 SipAccount, SipUser = sip.SipAccount, sip.SipUser
 caller_name, digest_authorization, parse = sip.caller_name, sip.digest_authorization, sip.parse
@@ -87,6 +89,30 @@ def test_register_answers_the_challenge_once() -> None:
     assert len(reaction.send) == 1
     assert b'Authorization: Digest username="dev1"' in reaction.send[0]
     assert agent.receive(challenge).registered is False
+
+
+def test_next_register_answers_a_new_challenge_after_a_failed_round() -> None:
+    agent = user()
+    challenge = b'SIP/2.0 401 Unauthorized\r\nCSeq: 1 REGISTER\r\nWWW-Authenticate: Digest realm="r", nonce="n"\r\n\r\n'
+    agent.register()
+    agent.receive(challenge)
+    assert agent.receive(challenge).registered is False
+    agent.register()
+    again = agent.receive(challenge)
+    assert again.registered is None
+    assert b"Authorization: Digest" in again.send[0]
+
+
+def test_call_signalling_is_logged_with_its_reason(caplog: pytest.LogCaptureFixture) -> None:
+    agent = user()
+    agent.receive(INVITE.encode())
+    cancel = request("CANCEL").replace(
+        b"Content-Length",
+        b'Reason: SIP;cause=200;text="Call completed elsewhere"\r\nContent-Length',
+    )
+    with caplog.at_level("DEBUG", logger=sip.__name__):
+        agent.receive(cancel)
+    assert "SIP CANCEL call call-1 from 255e826a0d0a, reason: SIP;cause=200" in caplog.text
 
 
 def test_register_ok_and_failure() -> None:

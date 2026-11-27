@@ -113,6 +113,7 @@ class CallListener:
             _LOGGER.warning("Calls of %s are not received: %s", control.name, error)
 
     def _on_event(self, control_id: int, client: SipClient, event: CallEvent) -> None:
+        _LOGGER.debug("Intercom %s: %s of call %s", control_id, event.kind, event.call_id)
         doorbell = self._coordinator.doorbell(control_id)
         key = f"{control_id}:{event.call_id}"
         if event.kind == "ring":
@@ -127,6 +128,12 @@ class CallListener:
         doorbell.notify(event)
 
     def _expire(self, control_id: int, client: SipClient, event: CallEvent) -> None:
+        _LOGGER.debug(
+            "Call %s of intercom %s got no CANCEL in %s s",
+            event.call_id,
+            control_id,
+            RING_TIMEOUT_SECONDS,
+        )
         self._timers.pop(f"{control_id}:{event.call_id}", None)
         client.forget(event.call_id)
         self._coordinator.doorbell(control_id).notify(CallEvent("end", event.call_id, event.caller))
