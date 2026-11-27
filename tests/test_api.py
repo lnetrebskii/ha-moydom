@@ -89,6 +89,17 @@ async def test_login_without_contracts_fails() -> None:
         await api_mod.MoydomApi(session, "iid-1").async_login("79001234567")
 
 
+async def test_confirm_keeps_null_account_id_for_profile_logins() -> None:
+    session = FakeSession()
+    session.push(200, {"accessToken": "a", "refreshToken": "r", "operatorId": 32})
+    item = {**LOGIN_ITEM, "accountId": None, "profileId": "458074"}
+    account = models.Account.from_json(item)
+    assert account.key == "profile-458074"
+    await api_mod.MoydomApi(session, "iid-1").async_confirm("79001234567", account, "1234")
+    assert session.calls[0].json["accountId"] is None
+    assert session.calls[0].json["profileId"] == "458074"
+
+
 async def test_confirm_sends_code_twice_and_stores_tokens() -> None:
     session = FakeSession()
     session.push(200, {"accessToken": "a", "refreshToken": "r", "operatorId": 32})

@@ -26,13 +26,18 @@ class Account:
     address: str | None
     profile_id: str | None
 
+    @property
+    def key(self) -> str:
+        """Return a stable id: profile-only logins have no account number."""
+        return self.account_id or f"profile-{self.profile_id}"
+
     @classmethod
     def from_json(cls, data: dict[str, Any]) -> Account:
         """Build an account from an ``auth/v2/login`` list item."""
         return cls(
             operator_id=int(data["operatorId"]),
             subscriber_id=int(data["subscriberId"]),
-            account_id=str(data["accountId"]),
+            account_id=str(data["accountId"]) if data.get("accountId") else "",
             place_id=int(data["placeId"]),
             address=data.get("address"),
             profile_id=data.get("profileId"),
@@ -42,7 +47,7 @@ class Account:
         """Return the body for ``auth/v2/confirmation``."""
         return {
             "operatorId": self.operator_id,
-            "accountId": self.account_id,
+            "accountId": self.account_id or None,
             "address": self.address,
             "profileId": self.profile_id,
             "subscriberId": self.subscriber_id,

@@ -99,10 +99,10 @@ class MoydomConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Choose the contract when the phone has several."""
         if user_input is not None:
-            self._account = next(a for a in self._accounts if a.account_id == user_input["account"])
+            self._account = next(a for a in self._accounts if a.key == user_input["account"])
             return await self._send_code()
         options = {
-            a.account_id: f"{a.address or a.account_id} (…{a.account_id[-4:]})"
+            a.key: f"{a.address or a.key} (…{a.key[-4:]})"
             for a in self._accounts
         }
         return self.async_show_form(
@@ -152,12 +152,12 @@ class MoydomConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_ACCOUNT_ID: self._account.account_id,
             CONF_PLACE_ID: self._account.place_id,
         }
-        await self.async_set_unique_id(f"{operator_id}_{self._account.account_id}")
+        await self.async_set_unique_id(f"{operator_id}_{self._account.key}")
         if self._reauth:
             self._abort_if_unique_id_mismatch()
             return self.async_update_reload_and_abort(self._get_reauth_entry(), data=data)
         self._abort_if_unique_id_configured()
-        title = self._account.address or self._account.account_id
+        title = self._account.address or self._account.key
         return self.async_create_entry(title=title, data=data)
 
     async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> ConfigFlowResult:

@@ -72,7 +72,7 @@ class MoydomApi:
 
     def _user_agent(self) -> str:
         """Build the app-style User-Agent that the forpost API requires."""
-        if self._tokens is None or not self._account_id:
+        if self._tokens is None:
             return LOGIN_USER_AGENT
         return " | ".join(
             (
@@ -205,7 +205,7 @@ class MoydomApi:
         body_json = {
             "operatorId": account.operator_id,
             "login": phone,
-            "accountId": account.account_id,
+            "accountId": account.account_id or None,
             "profileId": account.profile_id,
             "confirm1": code,
             "confirm2": code,
